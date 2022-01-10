@@ -10,7 +10,7 @@ class LoginController extends Controller
 {
     function login(Request $request)
     {
-        return $request->email;
+
         $user = User::where('email', $request->email)->first();
 
         // print_r($data);

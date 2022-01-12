@@ -15,11 +15,13 @@ class CreateTagsTable extends Migration
     {
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('fk_user_id');
             $table->string('tag_name')->nullable();
-            $table->string('tag_status')->nullable();
+            $table->string('tag_status')->default('active');
             $table->timestamps();
             $table->softDeletes();
 
+            $table->foreign('fk_user_id')->references('id')->on('users');
         });
     }
 

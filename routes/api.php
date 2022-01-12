@@ -10,8 +10,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', 'App\Http\Controllers\LoginController@login');
 
+//tags
+Route::resource('/tags', 'App\Http\Controllers\TagController')->names([
+    'index' => 'tags.index',
+    'create' => 'tags.create',
+    'store' => 'tags.store',
+    'show' => 'tags.show',
+    'edit' => 'tags.edit',
+    'update' => 'tags.update',
+]);
+
 //Route::group(['middleware' => 'auth:sanctum'], function () {
-    //All secure URL's
+//All secure URL's
 //});
 
 

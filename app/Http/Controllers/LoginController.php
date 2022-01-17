@@ -14,7 +14,7 @@ class LoginController extends Controller
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response([
-                'message' => ['These credentials do not match our records.']
+                'message' => ['These credentials do not match any records.']
             ], 401);
         }
 

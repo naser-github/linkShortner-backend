@@ -26,12 +26,14 @@ class TagController extends Controller
     public function store(Request $request)
     {
         request()->validate([
-            'tag_name' => 'required|unique:url_tags'
+            'tag_name' => 'required|unique:tags',
+            'desc' => 'required'
         ]);
 
         $tag = new Tag();
         $tag->fk_user_id = Auth::id();
-        $tag->tag_name = $request->input('tag_name');
+        $tag->tag_name = $request->tag_name;
+        $tag->tag_desc = $request->tag_desc;
         $response = 'Tag has been created';
         $tag->save();
 
@@ -52,6 +54,7 @@ class TagController extends Controller
     {
         $request->validate([
             'tag_name' => 'required',
+            'desc' => 'required',
             'status' => 'required',
         ]);
 
@@ -61,8 +64,9 @@ class TagController extends Controller
             return response('Tag already exist', 404);
         }
 
-        $tag->tag_name = $request->input('tag_name');
-        $tag->tag_status = $request->input('status');
+        $tag->tag_name = $request->tag_name;
+        $tag->tag_desc = $request->tag_desc;
+        $tag->tag_status = $request->status;
         $response = 'Tag has been updated';
         $tag->save();
 

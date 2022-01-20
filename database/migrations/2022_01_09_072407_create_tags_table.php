@@ -17,6 +17,7 @@ class CreateTagsTable extends Migration
             $table->id();
             $table->foreignId('fk_user_id');
             $table->string('tag_name')->nullable();
+            $table->string('tag_desc')->nullable();
             $table->string('tag_status')->default('active');
             $table->timestamps();
             $table->softDeletes();

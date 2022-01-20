@@ -12,7 +12,7 @@ class TagController extends Controller
 {
     public function index()
     {
-        
+
         $response = Tag::where( 'fk_user_id', Auth::id() )->get();
 
         return response($response, 201);

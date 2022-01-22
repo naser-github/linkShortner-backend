@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/{short_url}','App\Http\Controllers\RedirectController@search')->name('url');
 
 

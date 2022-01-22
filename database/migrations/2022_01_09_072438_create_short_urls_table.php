@@ -16,10 +16,10 @@ class CreateShortUrlsTable extends Migration
         Schema::create('short_urls', function (Blueprint $table) {
             $table->id();
             $table->foreignId('fk_user_id');
-            $table->foreignId('fk_tag_id');
+            $table->foreignId('fk_tag_id')->nullable();
             $table->string('short_url');
             $table->string('long_url');
-            $table->string('link_status')->nullable();
+            $table->string('link_status')->default('active');
             $table->timestamps();
             $table->softDeletes();
 

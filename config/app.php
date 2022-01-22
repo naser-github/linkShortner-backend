@@ -175,7 +175,11 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        //for role permission
         Spatie\Permission\PermissionServiceProvider::class,
+
+        //for client device details
+        Jenssegers\Agent\AgentServiceProvider::class,
 
     ],
 
@@ -231,6 +235,9 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+
+        //for client device details
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
 
     ],
 

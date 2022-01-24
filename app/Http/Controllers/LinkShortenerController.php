@@ -78,40 +78,28 @@ class LinkShortenerController extends Controller
         $link = ShortUrl::where('id', $id)->first();
 
         $linkDetails = LinkDetails::where('fk_short_url', $id)
-//            ->whereYear('created_at', Carbon::now()->year)
-//            ->whereMonth('created_at', Carbon::now()->month)
-//            ->orderBy('id')
+            ->whereYear('created_at', Carbon::now()->year)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->orderBy('id')
             ->get();
-return $linkDetails;
+
         //total clicks
-        $totalClicks = LinkDetails::where('fk_short_url', $id)
-            ->count('fk_short_url');
+        $totalClicks = LinkDetails::where('fk_short_url', $id)->count('fk_short_url');
 
         //current day click
-        $dailyClicks = LinkDetails::where('fk_short_url', $id)
-            ->whereDate('created_at', carbon::today()->toDate())
-            ->count('fk_short_url');
+        $dailyClicks = LinkDetails::where('fk_short_url', $id)->whereDate('created_at', carbon::today()->toDate())->count('fk_short_url');
 
-        $response = [
-            'link' => $link,
-//            'avgClicks' => $avgClicks,
-
-        ];
-
-        return response($response, 201);
-
-//        avg click
-        $size = sizeof($linkDetails) - 1;
-//        if ($linkDetails) {
-//            $secs = strtotime($linkDetails[$size]->created_at) - strtotime($linkDetails[0]->created_at);
-//            $days = ceil($secs / 86400);
-//            if ($days == 0)
-//                $avgClicks = 1;
-//            else
-//                $avgClicks = round($totalClicks / $days, 2);
-//        } else {
-//            $avgClicks = 0;
-//        }
+        //avg click
+        if (count($linkDetails) > 0) {
+            $inSec = strtotime($linkDetails->last()->created_at) - strtotime($linkDetails->first()->created_at);
+            if ($inSec > 0) {
+                $days = ceil($inSec / 86400);
+                $avgClicks = round($totalClicks / $days, 2);
+            } else
+                $avgClicks = 1;
+        } else {
+            $avgClicks = 0;
+        }
 
 //        $dailyClickStat = [];
 //        $c = $i = $j = $k = 0;
@@ -161,15 +149,15 @@ return $linkDetails;
 //            $other = 0;
 //        }
 
-//        $response = [
-//            'link' => $link,
-//            'totalClicks' => $totalClicks,
-//            'dailyClicks' => $dailyClicks,
-////            'avgClicks' => $avgClicks,
-//
-//        ];
-//
-//        return response($response, 201);
+        $response = [
+            'link' => $link,
+            'totalClicks' => $totalClicks,
+            'dailyClicks' => $dailyClicks,
+            'avgClicks' => $avgClicks,
+
+        ];
+
+        return response($response, 201);
 
     }
 

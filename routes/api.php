@@ -17,6 +17,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::patch('/update-url/{id}', 'App\Http\Controllers\LinkShortenerController@updateUrl')->name('updateUrl');
     });
+
+    //dashboard
+    Route::get('/dashboard', 'App\Http\Controllers\DashboardController@dashboard')->name('dashboard');
 });
 
 Route::post('/login', 'App\Http\Controllers\LoginController@login');

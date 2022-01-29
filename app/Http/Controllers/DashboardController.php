@@ -30,35 +30,18 @@ class DashboardController extends Controller
 //            ->where('short_urls.fk_user_id', '=', Auth::user()->id)
 //            ->select('link_visit_details.client_device')
 //            ->get();
-//
-//        $mobileCount = 0;
-//        $desktopCount = 0;
-//        $otherCount = 0;
-//        $size = sizeof($devices);
-//
-//        if ($size > 0) {
-//            foreach ($devices as $device) {
-//                if ($device->client_device == 'phone')
-//                    $mobileCount++;
-//                elseif ($device->client_device == 'desktop')
-//                    $desktopCount++;
-//                else
-//                    $otherCount++;
-//            }
-//
-//            $mobile = (100 * $mobileCount) / $size;
-//            $desktop = (100 * $desktopCount) / $size;
-//            $other = (100 * $otherCount) / $size;
-//        } else {
-//            $mobile = 0;
-//            $desktop = 0;
-//            $other = 0;
-//        }
+
+        $deviceTypes = ShortUrl::where('short_urls.fk_user_id', '=', Auth::user()->id)
+            ->leftJoin('link_details', 'link_details.fk_short_url', '=', 'short_urls.id')
+            ->select(DB::raw('link_details.client_device, COUNT(link_details.client_device) as total_client_device'))
+            ->groupBy('link_details.client_device')
+            ->get();
 
         $response = [
             'totalLinks' => $totalLinks,
             'linkToday' => $linkToday,
             'visitedToday' => $visitedToday,
+            'deviceTypes' => $deviceTypes,
         ];
 
         return response($response, 201);

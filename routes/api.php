@@ -10,10 +10,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::get('/my-urls', 'App\Http\Controllers\LinkShortenerController@myURL')->name('myLinks');
         Route::get('/url-details/{id}', 'App\Http\Controllers\LinkShortenerController@urlDetails')->name('urlDetails');
-        //filterData
-        Route::post('/filterData', 'App\Http\Controllers\LinkShortenerController@filterData')->name('filterData');
 
-        Route::post('/url-tag-edit-modal', 'App\Http\Controllers\LinkShortenerController@editModal')->name('urlTagEditModal');
+        //filterData
+//        Route::post('/filterData', 'App\Http\Controllers\LinkShortenerController@filterData')->name('filterData');
+
+//        Route::post('/url-tag-edit-modal', 'App\Http\Controllers\LinkShortenerController@editModal')->name('urlTagEditModal');
 
         Route::patch('/update-url/{id}', 'App\Http\Controllers\LinkShortenerController@updateUrl')->name('updateUrl');
     });

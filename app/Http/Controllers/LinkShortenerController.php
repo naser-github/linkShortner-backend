@@ -10,6 +10,7 @@ use Faker\Provider\DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 
 class LinkShortenerController extends Controller
@@ -130,90 +131,72 @@ class LinkShortenerController extends Controller
 
     }
 
-    public function filterData(Request $request)
-    {
-        $linkDetails = DB::table('link_visit_details')
-            ->where('fk_short_url', '=', $request->link_id)
-            ->whereMonth('created_at', $request->month)
-            ->whereYear('created_at', $request->year)
-            ->orderBy('id')
-            ->get();
-
-        $dailyClickStat = [];
-        $c = $i = $j = $k = 0;
-        $size = sizeof($linkDetails) - 1;
-        $dateObj = DateTime::createFromFormat('!m', $request->month);
-        $currentMonth = $dateObj->format('F');
-        $currentYear = $request->year;
-
-        if ($request->month == '1' || $request->month == '3' || $request->month == '5' || $request->month == '7' || $request->month == '8' || $request->month == '10' || $request->month == '12')
-            $limit = 31;
-        else
-            $limit = 30;
-
-        while ($i < $limit) {
-            while ($j <= $size) {
-                if (date('d', strtotime($linkDetails[$j]->created_at)) == $i + 1)
-                    $c++;
-                else
-                    break;
-                $j++;
-            }
-            $dailyClickStat[$i] = $c;
-            $c = 0;
-            $i++;
-        }
-        return view(
-            'pages.operator.myUrl.filterData',
-            compact('dailyClickStat', 'currentMonth', 'currentYear')
-        );
-
-    }
+//    public function filterData(Request $request)
+//    {
+//        $linkDetails = DB::table('link_visit_details')
+//            ->where('fk_short_url', '=', $request->link_id)
+//            ->whereMonth('created_at', $request->month)
+//            ->whereYear('created_at', $request->year)
+//            ->orderBy('id')
+//            ->get();
+//
+//        $dailyClickStat = [];
+//        $c = $i = $j = $k = 0;
+//        $size = sizeof($linkDetails) - 1;
+//        $dateObj = DateTime::createFromFormat('!m', $request->month);
+//        $currentMonth = $dateObj->format('F');
+//        $currentYear = $request->year;
+//
+//        if ($request->month == '1' || $request->month == '3' || $request->month == '5' || $request->month == '7' || $request->month == '8' || $request->month == '10' || $request->month == '12')
+//            $limit = 31;
+//        else
+//            $limit = 30;
+//
+//        while ($i < $limit) {
+//            while ($j <= $size) {
+//                if (date('d', strtotime($linkDetails[$j]->created_at)) == $i + 1)
+//                    $c++;
+//                else
+//                    break;
+//                $j++;
+//            }
+//            $dailyClickStat[$i] = $c;
+//            $c = 0;
+//            $i++;
+//        }
+//        return view(
+//            'pages.operator.myUrl.filterData',
+//            compact('dailyClickStat', 'currentMonth', 'currentYear')
+//        );
+//
+//    }
 
     public function updateUrl(Request $request, $id)
     {
         request()->validate([
-            'url' => 'required',
-            'status' => 'required'
+            'longUrl' => 'required',
+            'shortUrl' => 'required',
+            'status' => 'required',
         ]);
 
         $url = ShortUrl::where('id', $id)->first();
 
-        if ($url->id) {
-
-            if ($request->input('tag') != null) {
-                $tag = UrlTag::where('id', $request->input('tag'))->first();
-
-                if (!$tag)
-                    return back();
-            }
-            $url->long_url = $request->input('url');
-            $url->fk_tag_id = $request->input('tag');
+        if ($url) {
+            $url->long_url = $request->input('longUrl');
+            $url->short_url = $request->input('shortUrl');
             $url->link_status = $request->input('status');
             $url->save();
         } else {
-            return back();
+            $response = [
+                'msg' => "URL Doesn't exist",
+            ];
+            return response($response, 404);
         }
 
-        if (Auth::user()->getRoleNames()[0] == 'operator')
-            return Redirect::route('mylink');
-        else
-            return Redirect::route('url_management');
-
-    }
-
-    public function editModal(Request $request)
-    {
-        if (Auth::user()->getRoleNames()[0] == 'operator')
-            $tags = UrlTag::where('fk_department_id', Auth::user()->profile->fk_user_department)
-                ->where('tag_status', 'active')
-                ->get();
-        else
-            $tags = UrlTag::where('tag_status', 'active')->get();
-        $shortTagId = $request->input('id');
-
-        return view('pages.operator.myUrl.url-tag-edit-modal',
-            compact('tags', 'shortTagId'));
+        $response = [
+            'msg' => "URL has been successfully updated",
+        ];
+        return response($response, 201);
     }
 
 }

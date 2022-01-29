@@ -77,12 +77,6 @@ class LinkShortenerController extends Controller
     {
         $link = ShortUrl::where('id', $id)->first();
 
-        $linkDetails = LinkDetails::where('fk_short_url', $id)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->orderBy('id')
-            ->get();
-
         //total clicks
         $totalClicks = LinkDetails::where('fk_short_url', $id)->count('fk_short_url');
 
@@ -90,16 +84,16 @@ class LinkShortenerController extends Controller
         $dailyClicks = LinkDetails::where('fk_short_url', $id)->whereDate('created_at', carbon::today()->toDate())->count('fk_short_url');
 
         //avg click
-        if (count($linkDetails) > 0) {
-            $inSec = strtotime($linkDetails->last()->created_at) - strtotime($linkDetails->first()->created_at);
-            if ($inSec > 0) {
-                $days = ceil($inSec / 86400);
-                $avgClicks = round($totalClicks / $days, 2);
-            } else
-                $avgClicks = 1;
-        } else {
-            $avgClicks = 0;
-        }
+        $averageClicks = LinkDetails::where('fk_short_url', $id)
+            ->selectRaw('COUNT(DATE(created_at))')
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->get()->avg('COUNT(DATE(created_at))');
+
+//        pie chart
+        $deviceTypes = LinkDetails::where('fk_short_url', $id)
+            ->select(DB::raw('client_device, COUNT(client_device) as total_client_device'))
+            ->groupBy('client_device')
+            ->get();
 
 //        $dailyClickStat = [];
 //        $c = $i = $j = $k = 0;
@@ -107,7 +101,7 @@ class LinkShortenerController extends Controller
 //        $dateObj = DateTime::createFromFormat('!m', Carbon::now()->month);
 //        $currentMonth = $dateObj->format('F');
 //        $currentYear = Carbon::now()->year;
-
+//
 //        $daysInMonth = Carbon::now()->daysInMonth;
 //        $c = $i = $j = $k = 0;
 //
@@ -124,37 +118,12 @@ class LinkShortenerController extends Controller
 //            $i++;
 //        }
 
-
-        //pie chart
-//        $mobileCount = 0;
-//        $desktopCount = 0;
-//        $otherCount = 0;
-//        $size = sizeof($linkDetails);
-//
-//        if ($size > 0) {
-//            foreach ($linkDetails as $device) {
-//                if ($device->client_device == 'phone')
-//                    $mobileCount++;
-//                elseif ($device->client_device == 'desktop')
-//                    $desktopCount++;
-//                else
-//                    $otherCount++;
-//            }
-//            $mobile = (100 * $mobileCount) / $size;
-//            $desktop = (100 * $desktopCount) / $size;
-//            $other = (100 * $otherCount) / $size;
-//        } else {
-//            $mobile = 0;
-//            $desktop = 0;
-//            $other = 0;
-//        }
-
         $response = [
             'link' => $link,
+            'deviceTypes' => $deviceTypes,
             'totalClicks' => $totalClicks,
             'dailyClicks' => $dailyClicks,
-            'avgClicks' => $avgClicks,
-
+            'averageClicks' => $averageClicks,
         ];
 
         return response($response, 201);

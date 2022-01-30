@@ -11,7 +11,10 @@ class UserProfileController extends Controller
 {
     public function editProfile($id)
     {
-        $user = User::where('id', $id)->first();
+        $user = User::where('users.id', $id)
+            ->leftJoin('user_profiles', 'user_profiles.fk_user_id', '=', 'users.id')
+            ->first();
+
 
         if (!$user) {
             $response = [
@@ -24,7 +27,6 @@ class UserProfileController extends Controller
 
         $response = [
             'user' => $user,
-            'name' => $name
         ];
         return response($response, 201);
     }
@@ -32,19 +34,22 @@ class UserProfileController extends Controller
     public function updateProfile(Request $request, $id)
     {
         request()->validate([
-            'fname' => 'required|min:3',
-            'lname' => 'required',
+            'name' => 'required',
             'phone' => 'required|min:11||max:14',
             'password' => 'present|confirmed:password_confirm',
+            'status' => 'required',
         ]);
 
         $user = User::where('id', $id)->first();
 
         if (!$user) {
-            return back();
+            $response = [
+                'msg' => "User Doesn't exist",
+            ];
+            return response($response, 404);
         }
 
-        $name = $request->input('fname') . " " . $request->input('lname');
+        $name = $request->input('name');
         $phone = $request->input('phone');
 
         $user->name = $name;

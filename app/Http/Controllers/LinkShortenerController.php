@@ -66,7 +66,7 @@ class LinkShortenerController extends Controller
     public function myURL()
     {
         $urlList = ShortUrl::where('fk_user_id', Auth::user()->id)->get();
-
+//        $urlList = ShortUrl::where('fk_user_id', 1)->paginate(10);
         $response = [
             'urlList' => $urlList
         ];
